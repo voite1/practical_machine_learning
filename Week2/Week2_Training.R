@@ -1,4 +1,5 @@
-setwd('C:\\Users\\db345c\\Desktop\\Practical Machine Learning\\Week2')
+## setwd('C:\\Users\\db345c\\Desktop\\Practical Machine Learning\\Week2')
+setwd('C:\\Users\\Aleksey\\Documents\\School\\coursera\\Practical_Machine_Learning\\Week2')
 
 
 ######################################################################################
@@ -104,3 +105,20 @@ folds$train[[1]]
 
 # Look at the first test slice
 folds$test[[1]]
+
+######################################################################################
+# TRAINING OPTIONS ######################################################
+######################################################################################
+
+library(caret); library(kernlab); data(spam)
+inTrain <- createDataPartition(y=spam$type, p=0.75, list=FALSE)
+
+training <- spam[inTrain,]
+testing <- spam[-inTrain,]
+modelfit <- train(type ~ ., data = training, method = "glm")
+summary(modelfit)
+modelfit
+
+# There is a bunch of parameters available to configure
+# train function.
+
