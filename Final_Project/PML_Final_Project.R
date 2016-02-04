@@ -45,7 +45,7 @@ col_lst <- colSums(is.na(training)) == 0
 training <- training[, col_lst]
 testing <- testing[, col_lst]
 
-# adjusting data - remove index columns from training and testing data set
+# adjusting data - remove index, factor, and several date columns from training and testing data set
 testing <- testing[, -c(59)]
 # creating simple dummy data with 5 levels identical to those in training data set
 v = c('A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E')
