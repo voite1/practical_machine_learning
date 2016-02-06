@@ -97,31 +97,6 @@ inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
 my_training <- training[inTrain,]
 my_testing <- training[-inTrain,]
 
-################ CHECK if COLUMN CLASSES ARE OF THE SAME TYPE #################
-
-###### THIS IS JUST A CHECK - THE CLASSES OF THE COLUMNS IN TRAINING AND TESTING
-###### MUST BE IDENTICAL BY NOW
-# confirm tata types are the same between testing and my_testing
-for (i in 1:length(testing)) {
-  if (class(testing[, i]) != class(my_testing[, i])) {
-    print(i)
-    print(class(my_testing[, i]))
-    print(class(testing[, i]))
-  }
-}
-
-# confirm tata types are the same between testing and my_training
-for (i in 1:length(testing)) {
-  if (class(testing[, i]) != class(my_training[, i])) {
-    print(i)
-    print(class(my_training[, i]))
-    print(class(testing[, i]))
-  }
-}
-
-# cleanup unused vairables
-rm(i)
-
 ######################## BUILD MODELS #########################################
 
 # Build decision tree model
