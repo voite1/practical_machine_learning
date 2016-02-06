@@ -1,7 +1,9 @@
-# load required libraries
 library(caret)
 library(rpart)
 library(randomForest)
+
+############### SET UP ENVIRONMENT AND DOWNLOAD DATA ########################
+
 # Set appropriate working directory
 # setwd('C:\\Users\\db345c\\Desktop\\Practical Machine Learning\\Final_Project')
 setwd('C:\\Users\\Aleksey\\Documents\\School\\coursera\\Practical_Machine_Learning\\Final_Project')
@@ -45,16 +47,29 @@ col_lst <- colSums(is.na(training)) == 0
 training <- training[, col_lst]
 testing <- testing[, col_lst]
 
-# adjusting data - remove index, factor, and several date columns from training and testing data set
+# adjusting data - remove column 59 from the testing data (not needed)
 testing <- testing[, -c(59)]
+
 # creating simple dummy data with 5 levels identical to those in training data set
-v = c('A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E', 'A', 'B', 'C', 'D', 'E')
+# iterate throug the data frame using sample function to select a sample of size 1 from
+# vector called levels
+train_levels <- levels(training$classe)
+v <- vector(mode="character", length=0)
+for (i in testing[,1]) {
+  x <- sample(train_levels, size=1, replace = TRUE)
+  v <- c(v, x)
+}
+
+# apppending dummy data (as factor) with the same factors and number of factors as in the training data
+# as well as with the same name (simply for convenience)
 testing$classe <- as.factor(v)
+
+# Remove remove index, factor, and several date columns from training and testing data set
 testing <- testing[, -c(1:6)]
 training <- training[, -c(1:6)]
 
 # cleanup unused variables
-rm(col_lst, v)
+rm(col_lst, v, train_levels, x)
 
 # coerse training and testing data to the same data types and fix factors in testing
 for (i in 1:length(testing)) {
@@ -65,7 +80,7 @@ for (i in 1:length(testing)) {
   }      
 }
 
-# fix coersion that failed in previous step
+# fix coersion that failed in previous step (this is required!!!)
 for (i in 1:length(testing)) {
   if (class(training[, i]) != class(testing[, i])) {
     ### try fixing coersion, so testing and training data frames match
@@ -73,17 +88,19 @@ for (i in 1:length(testing)) {
   }
 }
 
+# cleanup unused variables
+rm(inTrain, i, j)
+
 # Partition data into two two sets - training and testing
 # Identical changes need to be made to testing and training data sets
 inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
 my_training <- training[inTrain,]
 my_testing <- training[-inTrain,]
 
-# cleanup unused variables
-rm(inTrain, i, j)
-
 ################ CHECK if COLUMN CLASSES ARE OF THE SAME TYPE #################
 
+###### THIS IS JUST A CHECK - THE CLASSES OF THE COLUMNS IN TRAINING AND TESTING
+###### MUST BE IDENTICAL BY NOW
 # confirm tata types are the same between testing and my_testing
 for (i in 1:length(testing)) {
   if (class(testing[, i]) != class(my_testing[, i])) {
