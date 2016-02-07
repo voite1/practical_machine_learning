@@ -52,7 +52,9 @@ testing <- testing[, -c(59)]
 
 # creating simple dummy data with 5 levels identical to those in training data set
 # iterate throug the data frame using sample function to select a sample of size 1 from
-# vector called levels
+# vector called levels. Not sure how to calculate out of sample error. I will use
+# my_testing set to do that, but the principle is the same. The classe variable was not
+# provided as a part of the testing data set.
 train_levels <- levels(training$classe)
 v <- vector(mode="character", length=0)
 for (i in testing[,1]) {
@@ -71,6 +73,11 @@ training <- training[, -c(1:6)]
 # cleanup unused variables
 rm(col_lst, v, train_levels, x)
 
+# Explore training and testing data to assure that all fields in both training and testing
+# data sets have identical classes for each of the fields.
+str(training)
+str(testing)
+
 # coerse training and testing data to the same data types and fix factors in testing
 for (i in 1:length(testing)) {
   for(j in 1:length(training)) {
@@ -88,32 +95,43 @@ for (i in 1:length(testing)) {
   }
 }
 
-# cleanup unused variables
-rm(inTrain, i, j)
-
 # Partition data into two two sets - training and testing
 # Identical changes need to be made to testing and training data sets
 inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)
 my_training <- training[inTrain,]
 my_testing <- training[-inTrain,]
 
+# cleanup unused variables
+rm(inTrain, i, j)
+
 ######################## BUILD MODELS #########################################
 
-# Build decision tree model
+# Build decision tree model and run predictions
 set.seed(212121)
 treeFit <- rpart(classe ~., data=my_training, method="class")
 treePredicted <- predict(treeFit, my_testing, type="class")
+# print confusion matrix for treePredicted vs. my_testing$classe
 confusionMatrix(treePredicted, my_testing$classe)
 
 # Build random forest model
 set.seed(212121)
 rfFit <- randomForest(classe ~., data=my_training)
 rfPredicted <- predict(rfFit, my_testing, type="class")
+# print convusion matrix for rfPredicted vs. my_testing$classe
 confusionMatrix(rfPredicted, my_testing$classe)
-
-finalAnswer <- predict(rfFit, testing, type="class")
 
 ############### PREDICTION ON THE TEST DATA SUPPLIED BY TEACHER ################
 
-# printing final answer
+# printing the answer for the quiz
+finalAnswer <- predict(rfFit, testing, type="class")
 print(finalAnswer)
+
+############### OUT OF SAMPLE ERROR ############################################
+
+# The classe variable was not provided as a part of the testing data set supplied
+# for this assignment, but it was recommended to use classe variable to predict on.
+# The principle of calculating out of sample error would be the same, but with
+# testing data set (if classe variable was provied). I used my_training data set.
+# I expect out of sample error to be slightly larger.
+error_rate = sum((my_testing$classe != rfPredicted) / length(rfPredicted))
+print(error_rate)
